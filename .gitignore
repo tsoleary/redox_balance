@@ -1,0 +1,14 @@
+# Files to gitignore -----------------------------------------------------------
+
+# R Specific files
+*.Rproj
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+
+# Directories
+
+
+# Specific files

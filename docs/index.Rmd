@@ -1,0 +1,68 @@
+---
+title: "Template Book Title"
+author: "TS O'Leary"
+date: "2023-03-22"
+description: "Template gitbook report of analysis"
+output:
+  bookdown::gitbook:
+    number_sections: true
+    split_by: chapter
+    toc_depth: 4
+    toc_collapse: true
+documentclass: book
+---
+
+<!-- A quick note to myself about compiling the gitbook. Render this book by using the Knit button in RStudio. When updating the book and knitting again, it may be useful to remove all directories and previous files other than this index.Rmd file. That will avoid saving old files whose sections have been re-named and therefore no longer exist, etc.  -->
+
+```{r, setup, include = FALSE}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+# Project goal {-}
+
+This is a minimal working book that contains the scripts used to create my analysis
+
+# Star Wars Analysis
+
+Analyzing and visualizing the Star Wars data set.
+
+## Load data & Count species
+
+First the data is loaded and then the species are counted.
+
+<!-- If you want to include code but don't want to run it. You may use eval = FALSE in the chunk option. This will print, but not execute the code. -->
+
+```{r, file = "src/starwars/01_count_species.R", eval = FALSE}
+```
+
+## Visualize data
+
+Visualize histogram of counted species.
+
+```{r, file = "src/starwars/02_histogram_species.R"}
+```
+
+# Iris Analysis
+
+Analyzing and visualizing the Iris data set.
+
+## Load data & Group species
+
+The data is loaded and then the species are grouped.
+
+```{r, file = "src/iris/01_load_group_data.R", eval = FALSE}
+```
+
+## Petal measurements
+
+Scatter plot of the petal measurements.
+
+```{r, file = "src/iris/02_petal_plot.R"}
+```
+
+
+# Session Info {-}
+
+```{r}
+sessionInfo()
+```
