@@ -10,12 +10,13 @@ output:
     toc_depth: 4
     toc_collapse: true
 documentclass: book
+runtime: shiny
 ---
 
 <!-- A quick note to myself about compiling the gitbook. Render this book by using the Knit button in RStudio. When updating the book and knitting again, it may be useful to remove all directories and previous files other than this index.Rmd file. That will avoid saving old files whose sections have been re-named and therefore no longer exist, etc.  -->
 
 ```{r, setup, include = FALSE}
-knitr::opts_knit$set(root.dir = here::here())
+knitr::opts_knit$set()
 ```
 
 # Project goal {-}
@@ -32,33 +33,114 @@ First the data is loaded and then the species are counted.
 
 <!-- If you want to include code but don't want to run it. You may use eval = FALSE in the chunk option. This will print, but not execute the code. -->
 
-```{r, file = "src/starwars/01_count_species.R", eval = FALSE}
-```
+```{r}
+# Load data
+dat <- readRDS(here::here("data/processed/metabolomics/dat.rds"))
+results <- readRDS(here::here("output/metabolomics/results.rds"))
+DAMs <- readRDS(here::here("output/metabolomics/DAMs.rds"))
 
+shinyApp(
+# Define UI for application that draws a histogram
+ui = fluidPage(
+
+    # Application title
+    titlePanel("Exploring the Metabolomics Data"),
+
+    # Sidebar with a slider input for number of bins 
+    sidebarLayout(
+        sidebarPanel(
+          
+          # Select metabolite
+          selectInput("metabolite", 
+                      "Metabolite", 
+                      selected = "NADH/NAD+ Ratio",
+                      choices = dat$Metabolite),
+        
+        # Select metabolite
+        checkboxInput("plot_type",
+                      "Plot individual genotypes",
+                      value = FALSE)),
+        
+        
+        
+        # Show a plot of the generated distribution
+        mainPanel(
+           plotOutput("abundance_plot"),
+           uiOutput("stats")
+        )
+      
+    )
+),
+
+# Define server logic required to draw a histogram
+server = function(input, output) {
+
+    output$abundance_plot <- renderPlot({
+      
+      if(input$plot_type) {
+        # Generate plot with individual genotypes
+        dat$data[[which(dat$Metabolite == input$metabolite)]] |>
+          ggplot(aes(y = NormIntensity,
+                     x = Temperature,
+                     fill = Temperature)) +
+          geom_boxplot() +
+          ggbeeswarm::geom_beeswarm(shape = 21,
+                                    size = 4,
+                                    cex = 4,
+                                    dodge.width = 0.75) +
+          scale_fill_manual(values = c("grey", "firebrick")) +
+          scale_y_continuous(name = paste(input$metabolite, "\n(normalized intensity)")) +
+          
+          scale_x_discrete(name = element_blank()) +
+          facet_wrap(~Locale) +
+          theme_minimal(base_size = 16)
+      } else {
+        dat$data[[which(dat$Metabolite == input$metabolite)]] |>
+          ggplot(aes(y = NormIntensity,
+                     x = Region,
+                     fill = Temperature)) +
+          geom_boxplot() +
+          ggbeeswarm::geom_beeswarm(shape = 21,
+                                    size = 5,
+                                    cex = 2,
+                                    dodge.width = 0.75) +
+          scale_fill_manual(values = c("grey", "firebrick")) +
+          scale_y_continuous(name = paste(input$metabolite, "\n(normalized intensity)")) +
+          scale_x_discrete(name = element_blank()) +
+          theme_minimal(base_size = 16)
+      }
+      
+
+    })
+    
+    output$stats <- renderUI({
+      table_html <- results |> 
+        filter(Metabolite == input$metabolite) |> 
+        filter(term %in% c("RegionTropical", 
+                           "Temperature32°C", 
+                           "RegionTropical:Temperature32°C")) |> 
+        select(Metabolite, term, estimate, std.error, df, statistic, p.value, p.value.adj) |> 
+        mutate( p.value.adj = ifelse(p.value.adj < 0.05, 
+            sprintf("<span style='color: red;'>%.4f</span>", p.value.adj), 
+            sprintf("%.4f", p.value.adj))) |> 
+        kableExtra::kable("html", escape = FALSE) |>
+        kableExtra::kable_styling()
+      
+      HTML(table_html)  # Convert to HTML for rendering in Shiny
+    })
+},
+
+  options = list(height = 500)
+)
+```
 ## Visualize data
 
-Visualize histogram of counted species.
 
-```{r, file = "src/starwars/02_histogram_species.R"}
-```
 
 # Iris Analysis
 
 Analyzing and visualizing the Iris data set.
 
-## Load data & Group species
-
-The data is loaded and then the species are grouped.
-
-```{r, file = "src/iris/01_load_group_data.R", eval = FALSE}
-```
-
-## Petal measurements
-
-Scatter plot of the petal measurements.
-
-```{r, file = "src/iris/02_petal_plot.R"}
-```
 
 
 # Session Info {-}

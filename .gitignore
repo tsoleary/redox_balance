@@ -9,6 +9,8 @@
 .DS_Store
 
 # Directories
-
+data/*
+output/*
+scratch/*
 
 # Specific files
