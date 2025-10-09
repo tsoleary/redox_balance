@@ -5,6 +5,7 @@
 
 # Load Libraries
 library(shiny)
+library(tidyverse)
 
 # Load data
 dat <- readRDS(here::here("data/processed/metabolomics/dat.rds")) |> 

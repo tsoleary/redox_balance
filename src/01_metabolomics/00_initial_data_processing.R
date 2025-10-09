@@ -60,7 +60,11 @@ p_box <- dat_norm |>
   ggplot() +
   geom_boxplot(aes(y = Metabolite,
                    x = NormIntensity),
-               fill = "grey90") +
+               fill = "grey90",
+               outlier.shape = 21,
+               outlier.fill = "grey80",
+               outlier.alpha = 0.5) +
+  scale_x_continuous(name = "Normalized intensity") +
   theme_minimal() +
   theme(axis.title.y = element_blank())
 
@@ -69,7 +73,10 @@ p_density <- dat_norm |>
   ggplot() +
   geom_density(aes(x = NormIntensity),
                fill = "grey90") +
-  theme_void()
+  theme_minimal() +
+  scale_y_continuous(name = "Density") +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank())
 
 # NormIntensity data
 p_norm <- cowplot::plot_grid(
@@ -86,8 +93,13 @@ p_box <- dat_norm |>
   ggplot() +
   geom_boxplot(aes(y = Metabolite,
                    x = pareto_scaled),
-               fill = "grey90") +
+               fill = "grey90",
+               outlier.shape = 21,
+               outlier.fill = "grey80",
+               outlier.alpha = 0.5) +
   theme_minimal() +
+  scale_x_continuous(name = "Pareto scaled",
+                     limits = c(-2.3, 2.3)) +
   theme(axis.title.y = element_blank())
 
 # Density plot of Pareto scaled data
@@ -95,9 +107,12 @@ p_density <- dat_norm |>
   ggplot() +
   geom_density(aes(x = pareto_scaled),
                fill = "grey90") +
-  theme_void()
+  theme_minimal() +
+  scale_y_continuous(name = "Density") +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),)
 
-# Pareto scaled data
+# Pareto scaled data# element_blank()Pareto scaled data
 p_pareto <- cowplot::plot_grid(
   p_density,
   p_box,
@@ -110,6 +125,7 @@ p_pareto <- cowplot::plot_grid(
 p_norm_all <- cowplot::plot_grid(
   p_norm,
   p_pareto,
+  labels = c("A", "B"),
   ncol = 2
 )
 
@@ -117,6 +133,12 @@ p_norm_all <- cowplot::plot_grid(
 ggsave(plot = p_norm_all,
        here::here("output/figs/metabolomics/normalization_box_density.pdf"),
        height = 8,
-       width = 10,
+       width = 8,
        units = "in")
+ggsave(plot = p_norm_all,
+       here::here("output/figs/metabolomics/normalization_box_density.png"),
+       height = 8,
+       width = 8,
+       units = "in")
+
 
