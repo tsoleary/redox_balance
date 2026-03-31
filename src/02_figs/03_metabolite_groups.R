@@ -879,3 +879,65 @@ ggsave(
   units = "in",
   bg = "white"
 )
+
+
+# Temp only results
+temp_only <- setdiff(
+  DAMs |> filter(term == "Temperature32°C") |> pull(Metabolite),
+  DAMs |> filter(term == "RegionTropical:Temperature32°C") |> pull(Metabolite))
+
+int <- DAMs |> filter(term == "RegionTropical:Temperature32°C") |> pull(Metabolite)
+
+dat_norm |> 
+  filter(Metabolite %in% int) |> 
+  mutate(pareto_scaled = ifelse(Metabolite == "GSSG/GSH-NEM Ratio",
+                                pareto_scaled*(-1),
+                                pareto_scaled)) |>
+  mutate(Metabolite = ifelse(Metabolite == "GSSG/GSH-NEM Ratio",
+                             "GSH/GSSG", Metabolite)) |>
+  mutate(Metabolite = str_remove_all(Metabolite, " Ratio")) |>
+  mutate(Metabolite = str_remove_all(Metabolite, "-NEM")) |>
+  mutate(Metabolite = ifelse(Metabolite == "Argininosuccinic acid",
+                             "ASA", Metabolite)) |>
+  mutate(Metabolite = factor(Metabolite, levels = c(
+    nucleo_metabolites, 
+    amino_acids, misc_intermediate_metabolites,
+    redox_metabolites))) |> 
+  filter(Region != "QC") |> 
+
+  group_by(Metabolite, Region, Temperature) |> 
+  summarise(avg = mean(pareto_scaled),
+            se = sd(pareto_scaled)/sqrt(n())) |> 
+  ggplot(aes(y = avg,
+             x = Temperature,
+             fill = Region,
+             color = Region,
+             group = Region)) +
+  geom_errorbar(aes(ymin = avg - se,
+                    ymax = avg + se),
+                width = 0.1) +
+  geom_hline(yintercept = 0, 
+             color = "grey70",
+             linetype = 2) +
+  geom_line() +
+  geom_point(shape = 21,
+             alpha = 0.9,
+             color = "grey50",
+             size = 2) +
+  scale_fill_manual(values = colors_genotypes[c(1, 4)]) +
+  scale_color_manual(values = colors_genotypes[c(1, 4)]) +
+  scale_y_continuous(name = "Pareto-scaled abundance") +
+  scale_x_discrete(expand = c(0.15, 0.15)) +
+  theme_minimal(base_size = 16) +
+  facet_wrap(~Metabolite, nrow = 2) +
+  theme(axis.title.x = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top")
+
+ggsave(
+  here::here("output/figs/metabolomics/interaction.pdf"),
+  height = 4.5,
+  width = 9,
+  units = "in",
+  bg = "white"
+)
