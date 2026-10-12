@@ -105,25 +105,6 @@ bio_values <- terra::extract(bio, terra::vect(lat_long))
 lat_long <- bind_cols(lat_long, bio_values) |> 
   left_join(lt_se, by = c("location" = "genotype"))
 
-# lat_long |> 
-#   mutate(genotype = factor(genotype, levels = c("VT", "FR", "JP",
-#                                                 "CH", "GA", "MU"))) |> 
-#   ggplot() +
-#   geom_point(aes(x = lat,
-#                  y = LT50,
-#                  fill = genotype),
-#              shape = 21,
-#              color = "grey90",
-#              size = 6) +
-#   scale_fill_manual(values = c("lightblue", "lightblue3", "lightblue4",
-#                                 "orchid4", "orchid", "orchid2" )) +
-#   scale_x_continuous(labels = function(x) paste0(x, "°N"),
-#                      name = "Lattitude") +
-#   scale_y_continuous(labels = function(x) paste0(x, "°C"),
-#                      name = expression("LT"[50])) +
-#   theme_minimal() +
-#   theme()
-
 p_lt_temp <- lat_long |> 
   mutate(genotype = factor(genotype, levels = c("VT", "FR", "JP",
                                                 "CH", "GA", "MU"))) |> 
@@ -172,14 +153,20 @@ cowplot::plot_grid(
 )
 
 ggsave(
-  here::here("output/figs/metabolomics/survival_lt50.pdf"),
-  width = 7, 
+  here::here("output/figs/final/fig_heat_tolerance.pdf"),
   height = 7,
+  width = 7,
   units = "in"
 )
 ggsave(
-  here::here("output/figs/metabolomics/survival_lt50.svg"),
-  width = 7, 
+  here::here("output/figs/final/fig_heat_tolerance.png"),
   height = 7,
+  width = 7,
+  units = "in"
+)
+ggsave(
+  here::here("output/figs/final/fig_heat_tolerance.svg"),
+  height = 7,
+  width = 7,
   units = "in"
 )

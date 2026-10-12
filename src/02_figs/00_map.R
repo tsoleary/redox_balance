@@ -58,11 +58,15 @@ map <- ggplot() +
 
 ggsave(
   plot = map,
-  here::here("output/figs/metabolomics/map.pdf")
+  here::here("output/figs/final/fig_collection_map.pdf")
 )
 ggsave(
   plot = map,
-  here::here("output/figs/metabolomics/map.svg")
+  here::here("output/figs/final/fig_collection_map.png")
+)
+ggsave(
+  plot = map,
+  here::here("output/figs/final/fig_collection_map.svg")
 )
 
 saveRDS(map, here::here("output/figs/metabolomics/map.rds"))
